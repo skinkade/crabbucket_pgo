@@ -1,5 +1,6 @@
 import crabbucket/pgo as crabbucket
 import envoy
+import gleam/dynamic
 import gleam/erlang/process
 import gleam/int
 import gleam/io
@@ -126,6 +127,15 @@ pub fn main() {
       ),
     )
   let context = Context(db: db)
+
+  // Configure database if needed and start cleaner
+  let assert Ok(_) =
+    pgo.execute(crabbucket.schema_migration_sql, db, [], dynamic.dynamic)
+  let assert Ok(_) =
+    pgo.execute(crabbucket.table_migration_sql, db, [], dynamic.dynamic)
+  let assert Ok(_) =
+    pgo.execute(crabbucket.index_migration_sql, db, [], dynamic.dynamic)
+  let _token_bucket_cleaner = crabbucket.create_and_start_cleaner(db, 1000 * 60)
 
   let assert Ok(_) =
     wisp.mist_handler(handle_request(_, context), secret_key_base)
