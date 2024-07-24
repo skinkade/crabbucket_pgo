@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: crabbucket_test_db
+    restart: always
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: crabbucket_test
+    volumes:
+      - pgdata:/var/lib/postgresql/crabbucket_test_data
+    ports:
+      - "0.0.0.0:5432:5432"
+ 
+volumes:
+  pgdata:
